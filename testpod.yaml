@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: time-printer
+  namespace: testing
+spec:
+  containers:
+  - name: time-printer
+    image: busybox
+    command: ["sh", "-c", "while true; do date; sleep 1; done"]
