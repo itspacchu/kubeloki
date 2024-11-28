@@ -18,6 +18,8 @@ type LokiMessage struct {
 	ContainerName string
 }
 
+//TODO: Have a function that reads a channel
+
 func PublishLoki(msg LokiMessage) error {
 	payload := map[string]interface{}{
 		"streams": []map[string]interface{}{
