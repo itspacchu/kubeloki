@@ -11,7 +11,7 @@ import (
 	"github.com/itspacchu/kubeloki/cmd/kubeapi"
 )
 
-const lokiAddress string = ""
+var lokiAddress string = ""
 
 type LokiMessage struct {
 	Timestamp     time.Time
