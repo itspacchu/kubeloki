@@ -20,7 +20,7 @@ var (
 	clientset   *kubernetes.Clientset
 	TIME_SCRAPE int64
 	// TODO: Expose to env variable
-	lokiAddress string = "http://172.16.16.4:32401/loki/api/v1/push"
+	lokiAddress string = "http://172.16.16.13:32044/loki/api/v1/push"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 	// TODO: Add Redis to store when last push was made for particular pod
 	log.Printf("[INFO] REDIS Server ...\n")
 	kubeconfig := filepath.Join(homedir.HomeDir(), ".kube", "config")
-	TIME_SCRAPE = 600
+	TIME_SCRAPE = 31729
 
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
@@ -37,10 +37,14 @@ func main() {
 	}
 
 	clientset, err = kubernetes.NewForConfig(config) // TODO: Pass Kubeconfig as a file
-	namespaces, err := clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
-	for _, namespace := range namespaces.Items {
-		PodsInNamespace(namespace)
-	}
+	fmt.Println(err)
+	// namespaces, err := clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
+	// for _, namespace := range namespaces.Items {
+	// 	PodsInNamespace("namespace")
+	// }
+	namespace, err := clientset.CoreV1().Namespaces().Get(context.TODO(), "satoc-summary", metav1.GetOptions{})
+	fmt.Println(err)
+	PodsInNamespace(*namespace)
 }
 
 func sendToLoki(logs string, ts time.Time, namespace string, pod string) error {
@@ -73,5 +77,6 @@ func sendToLoki(logs string, ts time.Time, namespace string, pod string) error {
 	if resp.StatusCode >= 300 { //204
 		return fmt.Errorf("[Err] HTTP Status %d (%s) %s", resp.StatusCode, namespace, pod)
 	}
+	fmt.Printf("Sent! %s\n", timestamp)
 	return nil
 }
